@@ -10,7 +10,7 @@ var app = express()
 
 app.use(logger('dev'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json({type:'application/vnd.api+json'}))
 app.use(methodOverride())
 
@@ -19,16 +19,16 @@ mongoose.connect(config.db, function(err) {
   if (err) { throw err }
 })
 
-var Zone = app.zone = restful.model('zone', mongoose.Schema({
-    id_firm: Number,
-    trade: String,
-    lng: String,
-    lat: String,
-    radius: Number,
+var zone = app.zone = restful.model('zone', mongoose.Schema({
+    id_firm: { type: 'number', required: true },
+    trade: { type: 'string', required: true },
+    lng: { type: 'string' },
+    lat: { type: 'string' },
+    radius: { type: 'number' },
   }))
-  .methods(['get', 'post', 'put'])
+  .methods(['get', 'post', 'put', 'delete'])
 
-Zone.register(app, '/zones')
+zone.register(app, '/zones')
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
