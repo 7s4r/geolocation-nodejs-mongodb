@@ -1,2 +1,2 @@
-# geolocation-nodejs-redis
-An API RESTful web service for geolocation
+# geolocation-nodejs-mongodb
+A RESTful API for geolocation
