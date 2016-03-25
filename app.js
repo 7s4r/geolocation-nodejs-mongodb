@@ -1,44 +1,34 @@
-var express = require('express')
-var path = require('path')
-var favicon = require('serve-favicon')
-var logger = require('morgan')
-var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
-var mongoose = require('mongoose')
-var config = require('./config')
+var express = require('express'),
+    logger = require('morgan'),
+    bodyParser = require('body-parser'),
+    methodOverride = require('method-override'),
+    config = require('./config'),
+    restful = require('node-restful'),
+    mongoose = restful.mongoose
 
 var app = express()
 
-function error(status, msg) {
-  var err = new Error(msg)
-  err.status = status
-  return err
-}
-
-// Connect to Mongo db
-mongoose.connect(config.db)
-
 app.use(logger('dev'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.json({type:'application/vnd.api+json'}))
+app.use(methodOverride())
 
-app.use('/api', function(req, res, next){
-  var key = req.query['api-key']
-
-  // key isn't present
-  if (!key) return next(error(400, 'api key required'))
-
-  // key is invalid
-  if (!config.apiKeys.indexOf(key)) return next(error(401, 'invalid api key'))
-
-  // all good, store req.key for route access
-  req.key = key
-  next()
+// Connect to Mongo db
+mongoose.connect(config.db, function(err) {
+  if (err) { throw err }
 })
 
-var geolocation = require('./routes/geolocation')
-app.use('/api/geolocation', geolocation)
+var Zone = app.zone = restful.model('zone', mongoose.Schema({
+    id_firm: Number,
+    trade: String,
+    lng: String,
+    lat: String,
+    radius: Number,
+  }))
+  .methods(['get', 'post', 'put'])
+
+Zone.register(app, '/zones')
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -3,5 +3,5 @@ module.exports = {
   'port': process.env.PORT || 3000,
   'locales': ['en', 'fr'],
   'apiKeys': ['foo', 'bar'],
-  'db': 'mongodb://127.0.0.1:27017/geolocation'
+  'db': 'mongodb://127.0.0.1:27017/zones'
 }
